@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="-CF9oBAUPiXVcSSlvzhw8vNdS6BZujn2tme1PDql0Yc" />
+    <title>Auto Ad Viewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --background-color: #f4f7f6;
+            --container-bg: #fff;
+            --text-color: #333;
+            --border-color: #eee;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --gradient-bg: linear-gradient(135deg, #007bff, #00c6ff);
+            --accent-color: #ff6b6b;
+            --font-weight-normal: 400;
+            --font-weight-bold: 700;
+        }
+        [data-theme="dark"] {
+            --primary-color: #0d6efd;
+            --secondary-color: #198754;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #0dcaf0;
+            --background-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #ddd;
+            --border-color: #333;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --gradient-bg: linear-gradient(135deg, #0d6efd, #0dcaf0);
+            --accent-color: #ff8c8c; /* Vibrant accent for dark mode */
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            background-image: var(--gradient-bg);
+            background-size: 200% 200%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--container-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            animation: fadeIn 0.6s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .profile-area {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+        .profile-image {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background-color: #ddd;
+            object-fit: cover;
+            margin-right: 18px;
+        }
+        .profile-info h3 {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: var(--font-weight-bold);
+            color: var(--text-color);
+        }
+        .profile-info p {
+            margin: 0;
+            font-size: 0.95em;
+            color: #777;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .button-group button {
+            flex-grow: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            background: var(--gradient-bg);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .button-group button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px var(--shadow-color), 0 0 10px var(--accent-color);
+        }
+        #manualAddBtn {
+            background: linear-gradient(135deg, #007bff, #00c6ff);
+        }
+        #autoAdBtn {
+            background: linear-gradient(135deg, #28a745, #34d058);
+        }
+        .report-section {
+            padding: 0 0 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            margin-bottom: 25px;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s;
+        }
+        [data-theme="dark"] .report-section {
+            background-color: #2c2c2c;
+        }
+        .report-stats-boxes {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px;
+        }
+        .stat-box {
+            flex: 1;
+            background: linear-gradient(135deg, #28a745, #007bff); /* Gradient background: Green to Blue */
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(255, 255, 255, 0.2); /* Neumorphism: soft shadow and inset */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            backdrop-filter: blur(10px); /* Glassmorphism: blur effect */
+            background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent for glass effect */
+            border: 1px solid rgba(255, 255, 255, 0.18); /* Glow border */
+        }
+        .stat-box:hover {
+            transform: scale(1.05); /* Hover: scale-up */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 0 15px rgba(255, 255, 255, 0.3); /* Hover: glow border */
+        }
+        .stat-box p {
+            margin: 0 0 6px 0;
+            font-size: 0.95em;
+            color: #fff; /* White text for contrast on gradient */
+        }
+        .stat-box span {
+            font-weight: var(--font-weight-bold);
+            font-size: 1.6em;
+            color: #fff; /* White for visibility */
+        }
+        .send-report-btn {
+            width: calc(100% - 36px);
+            padding: 12px;
+            background: linear-gradient(135deg, #ffc107, #ffda6a);
+            border: none;
+            border-radius: 14px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            margin: 0 18px 12px 18px;
+            display: block;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .send-report-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px var(--shadow-color);
+        }
+        .support-link {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, #17a2b8, #20c997);
+            color: white;
+            text-decoration: none;
+            border-radius: 14px;
+            transition: background-color 0.3s, transform 0.3s;
+            margin: 0 18px 18px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .support-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px var(--shadow-color);
+        }
+        .chart-box {
+            margin-top: 25px;
+            padding: 18px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            background-color: var(--container-bg);
+            animation: fadeInChart 1s ease-in;
+        }
+        @keyframes fadeInChart {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .chart-box h4 {
+            text-align: center;
+            margin-top: 0;
+            padding: 0 18px 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+        .progress-bar {
+            height: 12px;
+            background: #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 12px 18px;
+        }
+        .progress-bar div {
+            height: 100%;
+            width: 0%;
+            background: var(--secondary-color);
+            transition: width 0.4s ease;
+        }
+        .loader {
+            display: none;
+            text-align: center;
+        }
+        .loader div {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .theme-toggle {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        .lang-switcher {
+            margin: 12px 0;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .lang-switcher button {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--container-bg);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .lang-switcher button:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--container-bg);
+            padding: 25px;
+            border-radius: 20px;
+            max-width: 80%;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+        .modal-close {
+            margin-top: 12px;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        /* Feedback Popup */
+        #feedbackBtn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px;
+            background: var(--info-color);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+        }
+        #feedbackForm {
+            display: none;
+            margin-top: 20px;
+        }
+        #feedbackForm textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        /* Referral */
+        #referralBtn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px;
+            background: var(--warning-color);
+            color: #333;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+        }
+        @media (max-width: 400px) {
+            .container { padding: 15px; }
+            .button-group { flex-direction: column; gap: 10px; }
+            .button-group button { font-size: 1em; padding: 10px; }
+            .report-stats-boxes { flex-direction: column; }
+            .chart-box { padding: 12px; }
+        }
+        .verified-badge {
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+    <meta name="google-site-verification" content="-CF9oBAUPiXVcSSlvzhw8vNdS6BZujn2tme1PDql0Yc" />
+<body>
+    <div class="theme-toggle" id="themeToggle">🌙</div>
+    <div class="container" role="main" aria-labelledby="appTitle">
+        <h1 id="appTitle" style="display: none;">Earnings App</h1>
+        <div class="profile-area">
+            <img class="profile-image" id="userProfileImage" loading="lazy" src="" alt="User Profile Image">
+            <div class="profile-info">
+                <h3 id="userName">User Name (ID: 12345)</h3>
+                <p id="userStatus">Telegram Profile | Points: 0</p>
+            </div>
+        </div>
+        
+        <div class="lang-switcher" role="navigation" aria-label="Language Switcher">
+            <button onclick="setLanguage('bn')">BN</button>
+            <button onclick="setLanguage('en')">EN</button>
+            <button onclick="setLanguage('es')">ES</button> </div>
+        
+        <div class="button-group">
+            <button id="manualAddBtn" aria-label="Manual Add">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4V20M4 12H20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Manual Add
+            </button>
+            <button id="autoAdBtn" aria-label="Start Auto">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 5L19 12L5 19V5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Start Auto
+            </button>
+        </div>
+
+        <div class="report-section" role="region" aria-labelledby="reportTitle">
+            <h4 id="reportTitle" style="display: none;">Report Section</h4>
+            <div class="report-stats-boxes">
+                <div class="stat-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 4H5C3.89543 4 3 4.89543 3 6V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V6C21 4.89543 20.1046 4 19 4Z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> <!-- Calendar icon for Today Report -->
+                        <path d="M16 2V6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 2V6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 10H21" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p>Today Report</p>
+                    <span id="todayAdsCount">0</span>
+                </div>
+                <div class="stat-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 21H21" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> <!-- Stats icon for 7 Days Total -->
+                        <path d="M3 7V6.5C3 5.11929 4.11929 4 5.5 4H18.5C19.8807 4 21 5.11929 21 6.5V7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M20 15L18.9525 13.6037C18.038 12.4114 16.6209 11.8355 15.2037 12.0193C13.9844 12.181 13 13.1436 13 14.375C13 16.2124 11.2124 16.5 10.9998 16.5C10.5 16.5 10 15.9999 10 15.5V6.5C10 5.67157 10.6716 5 11.5 5H12.5C13.3284 5 14 5.67157 14 6.5V12.5C14 13.3284 14.6716 14 15.5 14H16.5C17.3284 14 18 13.3284 18 12.5V10.5C18 9.67157 18.6716 9 19.5 9H20" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p>7 Days Total</p>
+                    <span id="sevenDaysAdsCount">0</span>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div id="progress"></div>
+            </div>
+            
+            <button class="send-report-btn" id="sendReportBtn" aria-label="Send Today Report">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Send Today Report
+            </button>
+            
+            <a href="https://t.me/earningsupport3_bot" class="support-link" target="_blank" aria-label="Telegram Support">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 11.5C21 16.7467 16.7467 21 11.5 21C6.25329 21 2 16.7467 2 11.5C2 6.25329 6.25329 2 11.5 2C16.7467 2 21 6.25329 21 11.5Z" stroke="white" stroke-width="2"/>
+                    <path d="M21 21L15.8 15.8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Telegram Support (earningsupport3_bot)
+            </a>
+        </div>
+
+        <div class="chart-box" role="region" aria-labelledby="chartTitle">
+            <h4 id="chartTitle">Clicks/Week Report (Last 7 Days)</h4>
+            <canvas id="weeklyChartCanvas" style="max-height: 220px;"></canvas>
+        </div>
+        
+        <div class="loader" id="loader" aria-live="polite">
+            <div></div>
+        </div>
+
+        <button id="feedbackBtn" aria-label="Give Feedback">Give Feedback</button>
+        <div id="feedbackForm" role="dialog" aria-modal="true">
+            <textarea id="feedbackText" rows="4" placeholder="Your feedback..."></textarea>
+            <button onclick="submitFeedback()">Submit</button>
+        </div>
+    </div>
+
+    <div class="modal" id="onboardingModal" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+        <div class="modal-content">
+            <h2 id="onboardingTitle">Welcome to Earnings App!</h2>
+            <p>Step 1: View ads manually or auto.</p>
+            <p>Step 2: Earn points.</p>
+            <button class="modal-close" onclick="closeOnboarding()">Got it!</button>
+        </div>
+    </div>
+
+    <div class="modal" id="cpmBoosterModal">
+        <div class="modal-content">
+            <h2 id="cpmBoosterTitle">Please wait for high value ad...</h2>
+            <p>Stay on this screen for <span id="cpmBoosterTimer">15</span> seconds to get a better ad.</p>
+            <div class="loader"><div></div></div>
+        </div>
+    </div>
+
+    <script src='//libtl.com/sdk.js' data-zone='9925533' data-sdk='show_9925533' defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        // Constants
+        const BOT_TOKEN = '8078528483:AAGW64DKqazDIqx5XprFeAcPNQpPt9tDMkg'; // Updated bot token
+        const CHAT_ID = '6453637469'; // Updated chat ID
+        const MONEYTAG_SHOW_AD_FUNCTION = 'show_9925533';
+        const AD_SHOW_INTERVAL = 18000; // CPM বাড়ানোর জন্য সময় বাড়ানো হয়েছে
+        const CPM_BOOSTER_WAIT_TIME = 15; // উচ্চ মূল্যের বিজ্ঞাপনের জন্য অপেক্ষার সময় (সেকেন্ড)
+        const CHART_MAX_Y = 1000;
+        const DAILY_GOAL = 1000;
+        const POINTS_PER_AD = 10;
+
+        let autoAdInterval;
+        let currentLang = navigator.language.startsWith('bn') ? 'bn' : navigator.language.startsWith('es') ? 'es' : 'en'; // Auto-detection
+        let retryCount = 0;
+        const maxRetries = 5;
+
+        const translations = {
+            bn: {
+                manualAdd: 'ম্যানুয়াল অ্যাড',
+                autoAd: 'অটো শুরু',
+                stopAuto: 'অটো বন্ধ',
+                todayReport: 'আজকের রিপোর্ট',
+                sevenDays: '৭ দিনের মোট',
+                sendReport: 'আজকের রিপোর্ট পাঠান',
+                clicksWeek: 'ক্লিকস/সপ্তাহ রিপোর্ট (শেষ ৭ দিন)',
+            },
+            en: {
+                manualAdd: 'Manual Add',
+                autoAd: 'Start Auto',
+                stopAuto: 'Stop Auto',
+                todayReport: 'Today Report',
+                sevenDays: '7 Days Total',
+                sendReport: 'Send Today Report',
+                clicksWeek: 'Clicks/Week Report (Last 7 Days)',
+            },
+            es: { 
+                manualAdd: 'Añadir Manual',
+                autoAd: 'Iniciar Auto',
+                stopAuto: 'Detener Auto',
+                todayReport: 'Informe de Hoy',
+                sevenDays: 'Total de 7 Días',
+                sendReport: 'Enviar Informe de Hoy',
+                clicksWeek: 'Informe de Clics/Semana (Últimos 7 Días)',
+            }
+        };
+
+        // Data Storage
+        function getTodayDateKey() {
+            const date = new Date();
+            return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        }
+
+        function getDailyData() {
+            return JSON.parse(localStorage.getItem('dailyAds') || '{}');
+        }
+
+        function setDailyData(data) {
+            localStorage.setItem('dailyAds', JSON.stringify(data));
+        }
+
+        function getTodayAdCount() {
+            return getDailyData()[getTodayDateKey()] || 0;
+        }
+
+        function incrementAdCount() {
+            const todayKey = getTodayDateKey();
+            const dailyData = getDailyData();
+            dailyData[todayKey] = (dailyData[todayKey] || 0) + 1;
+            setDailyData(dailyData);
+            updatePoints();
+            updateReportDisplay();
+            drawChart();
+            updateProgressBar();
+            showToast('Ad viewed! +10 points', 'success');
+        }
+
+        function getSevenDaysAdCount() {
+            const dailyData = getDailyData();
+            let sevenDaysTotal = 0;
+            const today = new Date();
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                const key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+                sevenDaysTotal += dailyData[key] || 0;
+            }
+            return sevenDaysTotal;
+        }
+
+        function updateReportDisplay() {
+            document.getElementById('todayAdsCount').textContent = getTodayAdCount();
+            document.getElementById('sevenDaysAdsCount').textContent = getSevenDaysAdCount();
+        }
+
+        // Ad Show
+        function showAd() {
+            const modal = document.getElementById('cpmBoosterModal');
+            modal.style.display = 'flex';
+            let timeLeft = CPM_BOOSTER_WAIT_TIME;
+            const timerSpan = document.getElementById('cpmBoosterTimer');
+            timerSpan.textContent = timeLeft;
+
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timerSpan.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    modal.style.display = 'none';
+                    executeAdShow();
+                }
+            }, 1000);
+        }
+        
+        function executeAdShow() {
+            if (window[MONEYTAG_SHOW_AD_FUNCTION]) {
+                window[MONEYTAG_SHOW_AD_FUNCTION]().then(() => {
+                    incrementAdCount();
+                }).catch((error) => {
+                    console.error("Error showing ad:", error);
+                    showToast('Ad failed to load.', 'error');
+                });
+            } else {
+                console.warn("Monetag Ad function not available. Mocking.");
+                setTimeout(() => incrementAdCount(), 1000);
+            }
+        }
+
+        // Profile Load
+        async function loadTelegramProfile() {
+            document.getElementById('loader').style.display = 'block';
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const webApp = window.Telegram.WebApp;
+                    webApp.ready();
+                    const user = webApp.initDataUnsafe.user;
+                    if (user) {
+                        const fullName = (user.first_name || '') + (user.last_name ? ' ' + user.last_name : '');
+                        const verifiedBadge = ' <svg class="verified-badge" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#0064e0"/><path d="M5 10l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                        document.getElementById('userName').innerHTML = fullName + verifiedBadge + (user.id ? ` (ID: ${user.id})` : '');
+                        document.getElementById('userStatus').textContent = `@${user.username || 'No Username'} | Points: ${getTotalPoints()}`;
+                    } else {
+                        if (retryCount < maxRetries) {
+                            retryCount++;
+                            setTimeout(loadTelegramProfile, 500); // Retry after 500ms
+                            return;
+                        } else {
+                            const verifiedBadge = ' <svg class="verified-badge" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#0064e0"/><path d="M5 10l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                            document.getElementById('userName').innerHTML = 'Local Test User' + verifiedBadge;
+                            document.getElementById('userStatus').textContent = 'WebApp API Missing | Points: 0';
+                        }
+                    }
+                } else {
+                    const verifiedBadge = ' <svg class="verified-badge" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#0064e0"/><path d="M5 10l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                    document.getElementById('userName').innerHTML = 'Local Test User' + verifiedBadge;
+                    document.getElementById('userStatus').textContent = 'WebApp API Missing | Points: 0';
+                }
+                updateReportDisplay();
+                drawChart();
+                updateProgressBar();
+                updatePoints();
+                checkOnboarding();
+                requestNotificationPermission();
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        // Debounce
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        }
+
+        // Button Events
+        document.getElementById('manualAddBtn').addEventListener('click', debounce(() => {
+            showAd();
+        }, 500));
+
+        document.getElementById('autoAdBtn').addEventListener('click', (e) => {
+            const button = e.target;
+            if (button.textContent.includes(translations[currentLang].autoAd) || button.textContent.includes('Start')) {
+                button.textContent = translations[currentLang].stopAuto;
+                button.style.background = 'linear-gradient(135deg, #dc3545, #f35b5b)';
+                showAd();
+                autoAdInterval = setInterval(() => showAd(), AD_SHOW_INTERVAL);
+            } else {
+                button.textContent = translations[currentLang].autoAd;
+                button.style.background = 'linear-gradient(135deg, #28a745, #34d058)';
+                clearInterval(autoAdInterval);
+            }
+        });
+
+        // Send Report
+        async function sendTodayReport() {
+            const btn = document.getElementById('sendReportBtn');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            document.getElementById('loader').style.display = 'block';
+
+            showToast('Showing a quick ad before sending report...', 'info');
+            executeAdShow(); 
+            
+            setTimeout(async () => {
+                const todayAdViews = getTodayAdCount();
+                const sevenDaysAdViews = getSevenDaysAdCount();
+                let telegramUserID = 'N/A';
+                let telegramUsername = 'N/A';
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
+                    telegramUserID = window.Telegram.WebApp.initDataUnsafe.user.id;
+                    telegramUsername = window.Telegram.WebApp.initDataUnsafe.user.username || 'No Username';
+                }
+                const todayKey = getTodayDateKey();
+                const message = `**Daily Ad Report**\n\nDate: ${todayKey}\nUser ID: \`${telegramUserID}\`\nUsername: @${telegramUsername}\nToday's Total Ads Viewed: ${todayAdViews}\nLast 7 Days Total: ${sevenDaysAdViews}\nPoints: ${getTotalPoints()}`;
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        showToast('Report sent successfully! ✅', 'success');
+                        localStorage.setItem('totalPoints', 0); // Clear all points
+                        loadTelegramProfile();
+                    } else {
+                        showToast('Error sending report. ❌', 'error');
+                    }
+                } catch (error) {
+                    showToast('Network error. ⚠️', 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = translations[currentLang].sendReport;
+                    document.getElementById('loader').style.display = 'none';
+                }
+            }, 3000);
+        }
+
+        document.getElementById('sendReportBtn').addEventListener('click', sendTodayReport);
+
+        // Chart
+        function getWeeklyData() {
+            const dailyData = getDailyData();
+            const data = [];
+            const labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const today = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                const key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+                const dayIndex = date.getDay();
+                data.push({ day: labels[dayIndex], count: dailyData[key] || 0 });
+            }
+            return data;
+        }
+
+        let chartInstance;
+        function drawChart() {
+            const weeklyData = getWeeklyData();
+            const labels = weeklyData.map(item => item.day);
+            const data = weeklyData.map(item => item.count);
+            const backgroundColors = data.map(count => count > 20 ? '#28a745' : count > 10 ? '#ffc107' : '#dc3545');
+
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(document.getElementById('weeklyChartCanvas'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Ad Clicks',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: '#0056b3',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, 
+                            max: CHART_MAX_Y,
+                            ticks: {
+                                stepSize: 100
+                            }
+                        } 
+                    },
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                    animation: { duration: 1200, easing: 'easeInOutQuart' }
+                }
+            });
+        }
+
+        // Progress Bar
+        function updateProgressBar() {
+            const progress = (getTodayAdCount() / DAILY_GOAL) * 10000;
+            document.getElementById('progress').style.width = `${Math.min(progress, 100)}%`;
+        }
+
+        // Rewards System
+        function getTotalPoints() {
+            return parseInt(localStorage.getItem('totalPoints') || '0');
+        }
+
+        function updatePoints() {
+            let points = getTotalPoints();
+            points += POINTS_PER_AD;
+            localStorage.setItem('totalPoints', points);
+            document.getElementById('userStatus').textContent = `@${window.Telegram?.WebApp?.initDataUnsafe.user?.username || 'No Username'} | Points: ${points}`;
+        }
+
+        // Notifications
+        function requestNotificationPermission() {
+            if (Notification.permission !== 'granted') {
+                Notification.requestPermission();
+            }
+        }
+
+        // Onboarding
+        function checkOnboarding() {
+            if (!localStorage.getItem('onboardingShown')) {
+                document.getElementById('onboardingModal').style.display = 'flex';
+                localStorage.setItem('onboardingShown', 'true');
+            }
+        }
+
+        function closeOnboarding() {
+            document.getElementById('onboardingModal').style.display = 'none';
+        }
+
+        // Feedback
+        document.getElementById('feedbackBtn').addEventListener('click', () => {
+            document.getElementById('feedbackForm').style.display = 'block';
+        });
+
+        function submitFeedback() {
+            const text = document.getElementById('feedbackText').value;
+            if (text) {
+                showToast('Feedback submitted! Thank you.', 'success');
+                // TODO: Send to server
+                document.getElementById('feedbackForm').style.display = 'none';
+                document.getElementById('feedbackText').value = '';
+            } else {
+                showToast('Please enter feedback.', 'error');
+            }
+        }
+
+        // Toast
+        function showToast(message, type = 'info') {
+            let background;
+            if (type === 'success') background = '#28a745';
+            else if (type === 'error') background = '#dc3545';
+            else background = '#17a2b8';
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                style: { background: background }
+            }).showToast();
+        }
+
+        // Theme
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', theme);
+            document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+        });
+
+        // Language
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('manualAddBtn').innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4V20M4 12H20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${translations[lang].manualAdd}`;
+            const autoBtn = document.getElementById('autoAdBtn');
+            const isRunning = autoBtn.textContent.includes(translations[currentLang].stopAuto) || autoBtn.textContent.includes('Stop') || autoBtn.textContent.includes('Detener');
+            autoBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 5L19 12L5 19V5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${isRunning ? translations[lang].stopAuto : translations[lang].autoAd}`;
+            document.querySelector('.stat-box p:first-child').textContent = translations[lang].todayReport;
+            document.querySelector('.stat-box:nth-child(2) p').textContent = translations[lang].sevenDays;
+            document.getElementById('sendReportBtn').innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 2L11 13" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${translations[lang].sendReport}`;
+            document.querySelector('.chart-box h4').textContent = translations[lang].clicksWeek;
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement.tagName === 'BUTTON') {
+                document.activeElement.click();
+            }
+        });
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTelegramProfile();
+            setLanguage(currentLang);
+        });
+    </script>
+</body>
+</html>
