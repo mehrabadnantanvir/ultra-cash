@@ -953,6 +953,42 @@
             loadTelegramProfile();
             setLanguage(currentLang);
         });
+
+       
+  function onTelegramAuth(user) {
+    console.log("Telegram login user:", user);
+
+    // নাম সেট করো
+    const fullName = (user.first_name || '') + (user.last_name ? ' ' + user.last_name : '');
+    document.getElementById('name').textContent = fullName || "Unknown User";
+
+    // ইউজারনেম সেট করো
+    document.getElementById('username').textContent = user.username 
+      ? `@${user.username} | Points: 00`
+      : '@NoUsername | Points: 00';
+
+    // অ্যাভাটার সেট করো
+    const avatar = document.getElementById('avatar');
+    avatar.textContent = ''; // clear previous
+
+    if (user.photo_url) {
+      // প্রোফাইল ছবি থাকলে দেখাও
+      const img = document.createElement('img');
+      img.src = user.photo_url;
+      avatar.appendChild(img);
+    } else {
+      // না থাকলে initials বা fallback image
+      const initials = (user.first_name ? user.first_name[0] : 'U') + (user.last_name ? user.last_name[0] : '');
+      avatar.textContent = initials.toUpperCase();
+
+      // 👉 চাইলে fallback image ব্যবহার করতে পারো:
+      // const img = document.createElement('img');
+      // img.src = "default-avatar.png"; // নিজের ডিফল্ট ইমেজ
+      // avatar.appendChild(img);
+    }
+  }
+
+
     </script>
 </body>
 </html>
