@@ -99,6 +99,7 @@
             display: flex;
             gap: 12px;
             margin-bottom: 25px;
+            flex-wrap: wrap;
         }
         .button-group button {
             flex-grow: 1;
@@ -124,6 +125,12 @@
         }
         #autoAdBtn {
             background: linear-gradient(135deg, #28a745, #34d058);
+        }
+        #batch500Btn {
+            background: linear-gradient(135deg, #ffc107, #ffda6a);
+        }
+        #batch2000Btn {
+            background: linear-gradient(135deg, #17a2b8, #20c997);
         }
         .report-section {
             padding: 0 0 18px;
@@ -393,6 +400,18 @@
                 </svg>
                 Start Auto
             </button>
+            <button id="batch500Btn" aria-label="Start 500">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 5L19 12L5 19V5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Start 500
+            </button>
+            <button id="batch2000Btn" aria-label="Start 2000">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 5L19 12L5 19V5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Start 2000
+            </button>
         </div>
 
         <div class="report-section" role="region" aria-labelledby="reportTitle">
@@ -502,6 +521,8 @@
                 sevenDays: '৭ দিনের মোট',
                 sendReport: 'আজকের রিপোর্ট পাঠান',
                 clicksWeek: 'ক্লিকস/সপ্তাহ রিপোর্ট (শেষ ৭ দিন)',
+                batch500: 'স্টার্ট ৫০০',
+                batch2000: 'স্টার্ট ২০০০'
             },
             en: {
                 manualAdd: 'Manual Add',
@@ -511,6 +532,8 @@
                 sevenDays: '7 Days Total',
                 sendReport: 'Send Today Report',
                 clicksWeek: 'Clicks/Week Report (Last 7 Days)',
+                batch500: 'Start 500',
+                batch2000: 'Start 2000'
             },
             es: { 
                 manualAdd: 'Añadir Manual',
@@ -520,6 +543,8 @@
                 sevenDays: 'Total de 7 Días',
                 sendReport: 'Enviar Informe de Hoy',
                 clicksWeek: 'Informe de Clics/Semana (Últimos 7 Días)',
+                batch500: 'Iniciar 500',
+                batch2000: 'Iniciar 2000'
             }
         };
 
@@ -628,6 +653,14 @@
             });
         }
 
+        // Batch Ad Show
+        function showBatchAds(num) {
+            for (let i = 0; i < num; i++) {
+                setTimeout(showAd, i * AD_SHOW_INTERVAL);
+            }
+            showToast(`Starting batch of ${num} ads. Points will be awarded as ads are viewed.`, 'info');
+        }
+
         // In-App Interstitial Setup (from Guide, added for passive monetization)
         function setupInAppInterstitial() {
             window[MONEYTAG_SHOW_AD_FUNCTION]({
@@ -711,6 +744,14 @@
                 button.style.background = 'linear-gradient(135deg, #28a745, #34d058)';
                 clearInterval(autoAdInterval);
             }
+        });
+
+        document.getElementById('batch500Btn').addEventListener('click', () => {
+            showBatchAds(500);
+        });
+
+        document.getElementById('batch2000Btn').addEventListener('click', () => {
+            showBatchAds(2000);
         });
 
         // Send Report
@@ -892,6 +933,8 @@
             const autoBtn = document.getElementById('autoAdBtn');
             const isRunning = autoBtn.textContent.includes(translations[currentLang].stopAuto) || autoBtn.textContent.includes('Stop') || autoBtn.textContent.includes('Detener');
             autoBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 5L19 12L5 19V5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${isRunning ? translations[lang].stopAuto : translations[lang].autoAd}`;
+            document.getElementById('batch500Btn').innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 5L19 12L5 19V5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${translations[lang].batch500}`;
+            document.getElementById('batch2000Btn').innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 5L19 12L5 19V5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${translations[lang].batch2000}`;
             document.querySelector('.stat-box p:first-child').textContent = translations[lang].todayReport;
             document.querySelector('.stat-box:nth-child(2) p').textContent = translations[lang].sevenDays;
             document.getElementById('sendReportBtn').innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 2L11 13" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${translations[lang].sendReport}`;
