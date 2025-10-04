@@ -369,7 +369,6 @@
         }
     </style>
 </head>
-    <meta name="google-site-verification" content="-CF9oBAUPiXVcSSlvzhw8vNdS6BZujn2tme1PDql0Yc" />
 <body>
     <div class="theme-toggle" id="themeToggle">🌙</div>
     <div class="container" role="main" aria-labelledby="appTitle">
@@ -377,7 +376,7 @@
         <div class="profile-area">
             <img class="profile-image" id="userProfileImage" loading="lazy" src="" alt="User Profile Image">
             <div class="profile-info">
-                <h3 id="userName">User Name (ID: 12345)</h3>
+                <h3 id="user-name">User Name (ID: 12345)</h3>
                 <p id="userStatus">Telegram Profile | Points: 0</p>
             </div>
         </div>
@@ -455,7 +454,7 @@
                     <path d="M21 11.5C21 16.7467 16.7467 21 11.5 21C6.25329 21 2 16.7467 2 11.5C2 6.25329 6.25329 2 11.5 2C16.7467 2 21 6.25329 21 11.5Z" stroke="white" stroke-width="2"/>
                     <path d="M21 21L15.8 15.8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                Telegram Support (earningsupport3_bot)
+                Telegram Support
             </a>
         </div>
 
@@ -486,7 +485,7 @@
 
     <div class="modal" id="cpmBoosterModal">
         <div class="modal-content">
-            <h2 id="cpmBoosterTitle">Please wait for high value ad...</h2>
+            <h2 id="cpmBoosterTitle">Please wait for ad...</h2>
             <p>Stay on this screen for <span id="cpmBoosterTimer">15</span> seconds to get a better ad.</p>
             <div class="loader"><div></div></div>
         </div>
@@ -511,7 +510,7 @@
     // user object will include: id, username, first_name, last_name, photo_url (if available)
     console.log('Telegram login user:', user);
     document.getElementById('name').textContent = (user.first_name || '') + (user.last_name ? ' ' + user.last_name : '');
-    document.getElementById('username').textContent = user.username ? `@${user.username} | Points: 00` : '@NoUsername | Points: 00';
+    document.getElementById('username').textContent = user.username ? `@${user.username} | Points: 00` : '@user-name | Points: 00';
     if (user.photo_url) {
       const img = document.createElement('img');
       img.src = user.photo_url;
@@ -527,8 +526,8 @@
         const BOT_TOKEN = '8078528483:AAGW64DKqazDIqx5XprFeAcPNQpPt9tDMkg'; // Updated bot token
         const CHAT_ID = '6453637469'; // Updated chat ID
         const MONEYTAG_SHOW_AD_FUNCTION = 'show_9963061';
-        const AD_SHOW_INTERVAL = 18000; // CPM বাড়ানোর জন্য সময় বাড়ানো হয়েছে
-        const CPM_BOOSTER_WAIT_TIME = 15; // উচ্চ মূল্যের বিজ্ঞাপনের জন্য অপেক্ষার সময় (সেকেন্ড)
+        const AD_SHOW_INTERVAL = 18000; 
+        const CPM_BOOSTER_WAIT_TIME = 15; 
         const CHART_MAX_Y = 1000;
         const DAILY_GOAL = 1000;
         const POINTS_PER_AD = 10;
@@ -712,8 +711,8 @@
                     if (user) {
                         const fullName = (user.first_name || '') + (user.last_name ? ' ' + user.last_name : '');
                         const verifiedBadge = ' <svg class="verified-badge" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#0064e0"/><path d="M5 10l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-                        document.getElementById('userName').innerHTML = fullName + verifiedBadge + (user.id ? ` (ID: ${user.id})` : '');
-                        document.getElementById('userStatus').textContent = `@${user.username || 'No Username'} | Points: ${getTotalPoints()}`;
+                        document.getElementById('user-name').innerHTML = fullName + verifiedBadge + (user.id ? ` (ID: ${user.id})` : '');
+                        document.getElementById('userStatus').textContent = `@${user.username || 'user-name'} | Points: ${getTotalPoints()}`;
                     } else {
                         if (retryCount < maxRetries) {
                             retryCount++;
@@ -721,13 +720,13 @@
                             return;
                         } else {
                             const verifiedBadge = ' <svg class="verified-badge" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#0064e0"/><path d="M5 10l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-                            document.getElementById('userName').innerHTML = 'Local Test User' + verifiedBadge;
+                            document.getElementById('user-name').innerHTML = 'Local Test User' + verifiedBadge;
                             document.getElementById('userStatus').textContent = 'WebApp API Missing | Points: 0';
                         }
                     }
                 } else {
                     const verifiedBadge = ' <svg class="verified-badge" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#0064e0"/><path d="M5 10l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-                    document.getElementById('userName').innerHTML = 'Local Test User' + verifiedBadge;
+                    document.getElementById('user-name').innerHTML = 'Local Test User' + verifiedBadge;
                     document.getElementById('userStatus').textContent = 'WebApp API Missing | Points: 0';
                 }
                 updateReportDisplay();
@@ -793,14 +792,14 @@
             setTimeout(async () => {
                 const todayAdViews = getTodayAdCount();
                 const sevenDaysAdViews = getSevenDaysAdCount();
-                let telegramUserID = 'N/A';
-                let telegramUsername = 'N/A';
+                let telegramUserID = 'user-name';
+                let telegramUsername = 'user-name';
                 if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
                     telegramUserID = window.Telegram.WebApp.initDataUnsafe.user.id;
-                    telegramUsername = window.Telegram.WebApp.initDataUnsafe.user.username || 'No Username';
+                    telegramUsername = window.Telegram.WebApp.initDataUnsafe.user.username || 'user-name';
                 }
                 const todayKey = getTodayDateKey();
-                const message = `**Daily Ad Report**\n\nDate: ${todayKey}\nUser ID: \`${telegramUserID}\`\nUsername: @${telegramUsername}\nToday's Total Ads Viewed: ${todayAdViews}\nLast 7 Days Total: ${sevenDaysAdViews}\nPoints: ${getTotalPoints()}`;
+                const message = `**Daily Ad Report**\n\nDate: ${todayKey}\nUser ID: \`${telegramUserID}\`\nuser-name: @${telegramUsername}\nToday's Total Ads Viewed: ${todayAdViews}\nLast 7 Days Total: ${sevenDaysAdViews}\nPoints: ${getTotalPoints()}`;
                 const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
                 try {
                     const response = await fetch(url);
@@ -892,7 +891,7 @@
             let points = getTotalPoints();
             points += POINTS_PER_AD;
             localStorage.setItem('totalPoints', points);
-            document.getElementById('userStatus').textContent = `@${window.Telegram?.WebApp?.initDataUnsafe.user?.username || 'No Username'} | Points: ${points}`;
+            document.getElementById('userStatus').textContent = `@${window.Telegram?.WebApp?.initDataUnsafe.user?.username || 'user-name'} | Points: ${points}`;
         }
 
         // Notifications
@@ -966,6 +965,11 @@
             document.getElementById('sendReportBtn').innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 2L11 13" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${translations[lang].sendReport}`;
             document.querySelector('.chart-box h4').textContent = translations[lang].clicksWeek;
         }
+         
+
+        // --- DOM Elements ---
+            const userPhotoElem = document.getElementById('user-photo');
+            const userNameElem = document.getElementById('user-name');
 
         // Keyboard Navigation
         document.addEventListener('keydown', (e) => {
