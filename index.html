@@ -362,6 +362,7 @@
         }
     </style>
 </head>
+    <meta name="google-site-verification" content="-CF9oBAUPiXVcSSlvzhw8vNdS6BZujn2tme1PDql0Yc" />
 <body>
     <div class="theme-toggle" id="themeToggle">🌙</div>
     <div class="container" role="main" aria-labelledby="appTitle">
@@ -491,7 +492,6 @@
         let currentLang = navigator.language.startsWith('bn') ? 'bn' : navigator.language.startsWith('es') ? 'es' : 'en'; // Auto-detection
         let retryCount = 0;
         const maxRetries = 5;
-        let userId = null;
 
         const translations = {
             bn: {
@@ -571,7 +571,7 @@
             document.getElementById('sevenDaysAdsCount').textContent = getSevenDaysAdCount();
         }
 
-        // Ad Show
+        // Ad Show (Modified with Rewarded Interstitial Integration Guide)
         function showAd() {
             const modal = document.getElementById('cpmBoosterModal');
             modal.style.display = 'flex';
@@ -585,26 +585,61 @@
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
                     modal.style.display = 'none';
-                    executeAdShow();
+                    preloadAndExecuteAdShow(); // Use preloading for better performance
                 }
             }, 1000);
         }
         
-        function executeAdShow() {
-            if (window[MONEYTAG_SHOW_AD_FUNCTION]) {
-                const adOptions = { ymid: userId || 'anonymous' };
-                window[MONEYTAG_SHOW_AD_FUNCTION](adOptions).then(() => {
-                    incrementAdCount();
-                }).catch((error) => {
-                    console.error("Error showing ad:", error);
-                    showToast('Ad failed to load.', 'error');
-                    // Fallback mock for testing
-                    setTimeout(() => incrementAdCount(), 1000);
-                });
-            } else {
-                console.warn("Monetag Ad function not available. Mocking.");
-                setTimeout(() => incrementAdCount(), 1000);
+        // Preload and Execute Ad Show with ymid and fallback
+        function preloadAndExecuteAdShow() {
+            let ymid = 'default-event-id'; // Default ymid
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
+                ymid = window.Telegram.WebApp.initDataUnsafe.user.id.toString(); // Use Telegram user ID as ymid
             }
+
+            // Preload the ad
+            window[MONEYTAG_SHOW_AD_FUNCTION]({ type: 'preload', ymid: ymid }).then(() => {
+                // Show the ad after preload
+                window[MONEYTAG_SHOW_AD_FUNCTION]({ ymid: ymid }).then(() => {
+                    console.log('User watched the ad');
+                    incrementAdCount(); // Reward logic only after .then()
+                }).catch(() => {
+                    console.log('Ad failed or was skipped');
+                    showToast('Ad failed to load.', 'error');
+                    // Fallback logic: Try Rewarded Popup as alternative
+                    showRewardedPopupFallback(ymid);
+                });
+            }).catch(() => {
+                console.log('Preload failed');
+                showToast('Ad preload failed.', 'error');
+                // Fallback logic: Try Rewarded Popup as alternative
+                showRewardedPopupFallback(ymid);
+            });
+        }
+
+        // Rewarded Popup Fallback (from Reward Popup-Guide)
+        function showRewardedPopupFallback(ymid) {
+            window[MONEYTAG_SHOW_AD_FUNCTION]({ type: 'pop', ymid: ymid }).then(() => {
+                console.log('Popup attempt completed');
+                incrementAdCount(); // Reward on attempt completion (as per guide)
+            }).catch(() => {
+                console.log('Popup ad failed to open');
+                showToast('Popup ad failed to open.', 'error');
+            });
+        }
+
+        // In-App Interstitial Setup (from Guide, added for passive monetization)
+        function setupInAppInterstitial() {
+            window[MONEYTAG_SHOW_AD_FUNCTION]({
+                type: 'inApp',
+                inAppSettings: {
+                    frequency: 2, // Moderate frequency
+                    capping: 0.1, // 6 minutes session
+                    interval: 30, // 30 seconds between ads
+                    timeout: 5, // 5 seconds delay for first ad
+                    everyPage: false // Session continues across pages
+                }
+            });
         }
 
         // Profile Load
@@ -616,7 +651,6 @@
                     webApp.ready();
                     const user = webApp.initDataUnsafe.user;
                     if (user) {
-                        userId = user.id;
                         const fullName = (user.first_name || '') + (user.last_name ? ' ' + user.last_name : '');
                         const verifiedBadge = ' <svg class="verified-badge" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#0064e0"/><path d="M5 10l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
                         document.getElementById('userName').innerHTML = fullName + verifiedBadge + (user.id ? ` (ID: ${user.id})` : '');
@@ -643,6 +677,7 @@
                 updatePoints();
                 checkOnboarding();
                 requestNotificationPermission();
+                setupInAppInterstitial(); // Setup In-App Interstitial on load
             } catch (error) {
                 console.error('Error loading profile:', error);
             } finally {
@@ -667,21 +702,12 @@
         document.getElementById('autoAdBtn').addEventListener('click', (e) => {
             const button = e.target;
             if (button.textContent.includes(translations[currentLang].autoAd) || button.textContent.includes('Start')) {
-                button.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 5L19 12L5 19V5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${translations[currentLang].stopAuto}`;
+                button.textContent = translations[currentLang].stopAuto;
                 button.style.background = 'linear-gradient(135deg, #dc3545, #f35b5b)';
-                
-                // Preload ad for auto mode
-                if (window[MONEYTAG_SHOW_AD_FUNCTION] && userId) {
-                    window[MONEYTAG_SHOW_AD_FUNCTION]({ type: 'preload', ymid: userId }).catch((error) => {
-                        console.warn('Preload failed:', error);
-                        // Proceed anyway
-                    });
-                }
-                
                 showAd();
                 autoAdInterval = setInterval(() => showAd(), AD_SHOW_INTERVAL);
             } else {
-                button.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 5L19 12L5 19V5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${translations[currentLang].autoAd}`;
+                button.textContent = translations[currentLang].autoAd;
                 button.style.background = 'linear-gradient(135deg, #28a745, #34d058)';
                 clearInterval(autoAdInterval);
             }
@@ -695,7 +721,7 @@
             document.getElementById('loader').style.display = 'block';
 
             showToast('Showing a quick ad before sending report...', 'info');
-            executeAdShow(); 
+            preloadAndExecuteAdShow(); // Modified to use preloaded ad show
             
             setTimeout(async () => {
                 const todayAdViews = getTodayAdCount();
@@ -722,7 +748,7 @@
                     showToast('Network error. ⚠️', 'error');
                 } finally {
                     btn.disabled = false;
-                    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 2L11 13" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${translations[currentLang].sendReport}`;
+                    btn.textContent = translations[currentLang].sendReport;
                     document.getElementById('loader').style.display = 'none';
                 }
             }, 3000);
@@ -799,8 +825,7 @@
             let points = getTotalPoints();
             points += POINTS_PER_AD;
             localStorage.setItem('totalPoints', points);
-            const username = window.Telegram?.WebApp?.initDataUnsafe.user?.username || 'No Username';
-            document.getElementById('userStatus').textContent = `@${username} | Points: ${points}`;
+            document.getElementById('userStatus').textContent = `@${window.Telegram?.WebApp?.initDataUnsafe.user?.username || 'No Username'} | Points: ${points}`;
         }
 
         // Notifications
